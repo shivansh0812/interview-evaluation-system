@@ -1,0 +1,139 @@
+{
+  "software_engineer": [
+    {
+      "question": "Explain Object-Oriented Programming and describe its key principles in detail.",
+      "ideal_answer": "Object-Oriented Programming is a paradigm that organizes code using objects and classes. It is based on four principles: encapsulation, which binds data and methods together; inheritance, which allows code reuse; polymorphism, which enables methods to behave differently; and abstraction, which hides implementation details and exposes only necessary functionality."
+    },
+    {
+      "question": "What is the difference between arrays and linked lists, and when would you use each?",
+      "ideal_answer": "Arrays store elements in contiguous memory and allow fast access using indexing, while linked lists store elements as nodes connected by pointers. Arrays are efficient for random access, whereas linked lists are useful when frequent insertions and deletions are required."
+    },
+    {
+      "question": "How does version control improve collaboration in software development?",
+      "ideal_answer": "Version control systems track changes in code over time and allow multiple developers to work simultaneously. They support branching, merging, and reverting changes, making collaboration efficient and reducing the risk of code conflicts or data loss."
+    },
+    {
+      "question": "What is the purpose of APIs in software systems?",
+      "ideal_answer": "APIs allow different software components to communicate with each other. They define rules and protocols for interaction, enabling integration between systems, reuse of functionality, and modular application design."
+    },
+    {
+      "question": "Explain the concept of recursion with an example use case.",
+      "ideal_answer": "Recursion is a programming technique where a function calls itself to solve a problem. It is useful for problems that can be broken into smaller subproblems, such as calculating factorials or traversing tree data structures."
+    }
+  ],
+
+  "data_analyst": [
+    {
+      "question": "What is data preprocessing and why is it essential before analysis?",
+      "ideal_answer": "Data preprocessing involves cleaning and transforming raw data into a usable format. It includes handling missing values, removing duplicates, and correcting inconsistencies. It is essential because poor-quality data can lead to inaccurate analysis results."
+    },
+    {
+      "question": "Explain the difference between correlation and causation with an example.",
+      "ideal_answer": "Correlation indicates a relationship between two variables, while causation means one variable directly affects another. For example, ice cream sales and temperature are correlated, but temperature causes both increased sales and outdoor activity."
+    },
+    {
+      "question": "What is the role of SQL in data analysis?",
+      "ideal_answer": "SQL is used to query and manage structured data stored in databases. It allows analysts to retrieve, filter, aggregate, and manipulate data efficiently for analysis and reporting."
+    },
+    {
+      "question": "What are dashboards and how do they help in decision making?",
+      "ideal_answer": "Dashboards present data visually using charts and graphs, making it easier to understand trends and patterns. They help decision-makers quickly interpret key metrics and take informed actions."
+    },
+    {
+      "question": "What is data visualization and why is it important?",
+      "ideal_answer": "Data visualization is the representation of data using visual elements like charts and graphs. It is important because it simplifies complex data and helps in identifying patterns and insights quickly."
+    }
+  ],
+
+  "web_designer": [
+    {
+      "question": "What is responsive web design and why is it important?",
+      "ideal_answer": "Responsive web design ensures that web pages adapt to different screen sizes and devices. It is important because users access websites from various devices, and responsive design improves usability and accessibility."
+    },
+    {
+      "question": "Explain the roles of HTML, CSS, and JavaScript in web development.",
+      "ideal_answer": "HTML structures the content of a webpage, CSS is used for styling and layout, and JavaScript adds interactivity and dynamic behavior. Together they form the core technologies of web development."
+    },
+    {
+      "question": "What is user experience and how does it impact web design?",
+      "ideal_answer": "User experience refers to how users interact with a website. Good UX design ensures easy navigation, accessibility, and satisfaction, which improves user engagement and retention."
+    },
+    {
+      "question": "What is the difference between UI and UX design?",
+      "ideal_answer": "UI design focuses on the visual elements of a website, such as layout and colors, while UX design focuses on the overall user experience and usability of the system."
+    },
+    {
+      "question": "Why is accessibility important in web design?",
+      "ideal_answer": "Accessibility ensures that websites can be used by people with disabilities. It improves inclusivity and allows a wider audience to access digital content effectively."
+    }
+  ],
+
+  "machine_learning_engineer": [
+    {
+      "question": "Explain supervised and unsupervised learning with examples.",
+      "ideal_answer": "Supervised learning uses labeled data to train models, such as classification and regression tasks. Unsupervised learning works with unlabeled data and finds patterns, such as clustering or dimensionality reduction."
+    },
+    {
+      "question": "What is overfitting and how can it be avoided?",
+      "ideal_answer": "Overfitting occurs when a model learns training data too well and fails to generalize. It can be avoided using regularization, cross-validation, simpler models, and techniques like dropout."
+    },
+    {
+      "question": "What is feature engineering and why is it important?",
+      "ideal_answer": "Feature engineering involves selecting and transforming input variables to improve model performance. Good features help models learn patterns more effectively and increase accuracy."
+    },
+    {
+      "question": "What is the difference between training data and test data?",
+      "ideal_answer": "Training data is used to build and train a model, while test data is used to evaluate its performance on unseen data to ensure generalization."
+    },
+    {
+      "question": "What is a machine learning model?",
+      "ideal_answer": "A machine learning model is a mathematical representation that learns patterns from data and makes predictions or decisions based on input data."
+    }
+  ],
+
+  "it_manager": [
+    {
+      "question": "What are the main responsibilities of an IT manager?",
+      "ideal_answer": "An IT manager oversees technology infrastructure, manages teams, ensures system security, and aligns IT operations with business goals."
+    },
+    {
+      "question": "What is risk management in IT?",
+      "ideal_answer": "Risk management involves identifying and minimizing potential threats to systems and data to ensure business continuity and system reliability."
+    },
+    {
+      "question": "Why is cybersecurity important in organizations?",
+      "ideal_answer": "Cybersecurity protects systems and data from unauthorized access and attacks, ensuring confidentiality, integrity, and availability."
+    },
+    {
+      "question": "What is cloud computing and its advantages?",
+      "ideal_answer": "Cloud computing provides computing services over the internet, offering scalability, cost efficiency, and remote access to resources."
+    },
+    {
+      "question": "What is IT infrastructure?",
+      "ideal_answer": "IT infrastructure includes hardware, software, networks, and services required to operate and manage an organization’s IT environment."
+    }
+  ],
+
+  "architect": [
+    {
+      "question": "What is the role of an architect in building design?",
+      "ideal_answer": "An architect designs buildings, ensuring they are functional, safe, and visually appealing while meeting client and regulatory requirements."
+    },
+    {
+      "question": "What is a blueprint in construction?",
+      "ideal_answer": "A blueprint is a detailed technical drawing that represents the layout and design of a building, guiding construction processes."
+    },
+    {
+      "question": "What is sustainable architecture?",
+      "ideal_answer": "Sustainable architecture focuses on designing buildings that minimize environmental impact through efficient use of resources and energy."
+    },
+    {
+      "question": "What is structural integrity in architecture?",
+      "ideal_answer": "Structural integrity refers to the strength and stability of a building, ensuring it can withstand loads and environmental conditions."
+    },
+    {
+      "question": "What is urban planning?",
+      "ideal_answer": "Urban planning involves designing and organizing city spaces to ensure efficient use of land, infrastructure, and resources."
+    }
+  ]
+}
