@@ -1,10 +1,10 @@
 import streamlit as st
-from utils.question_loader import get_random_question
-from utils.evaluator import evaluate_answer, generate_feedback
-from utils.db_helper import insert_record, get_all_records
-
 import time
 import random
+import matplotlib.pyplot as plt
+
+from utils.question_loader import get_random_question
+from utils.evaluator import evaluate_answer, generate_feedback
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="Interview Evaluation System", layout="centered")
@@ -27,151 +27,97 @@ roles = [
 role = st.selectbox("Select Role", roles)
 
 # ---------------- SESSION INIT ----------------
-defaults = {
-    "questions": [],
-    "current_q": 0,
-    "scores": [],
-    "answered": False,
-    "user_answer": "",
-    "start_time": None
-}
-
-for key, value in defaults.items():
-    if key not in st.session_state:
-        st.session_state[key] = value
-
-# ---------------- LOAD QUESTIONS (RANDOM + UNIQUE) ----------------
-def load_questions():
+if "questions" not in st.session_state:
     st.session_state.questions = []
-    used = set()
-
-    # Try multiple times to ensure randomness
-    while len(st.session_state.questions) < 3:
-        q = get_random_question(role)
-        if q and q["question"] not in used:
-            st.session_state.questions.append(q)
-            used.add(q["question"])
-
     st.session_state.current_q = 0
     st.session_state.scores = []
-    st.session_state.answered = False
-    st.session_state.user_answer = ""
+    st.session_state.history = []
+    st.session_state.start_time = None
+    st.session_state.interview_started = False
+
+# ---------------- START BUTTON ----------------
+if st.button("🚀 Start Interview"):
+    st.session_state.questions = [
+        get_random_question(role) for _ in range(3)
+    ]
+    st.session_state.current_q = 0
+    st.session_state.scores = []
+    st.session_state.history = []
+    st.session_state.interview_started = True
     st.session_state.start_time = time.time()
 
-# ---------------- START ----------------
-if st.button("🚀 Start Interview"):
-    load_questions()
+# ---------------- INTERVIEW FLOW ----------------
+if st.session_state.interview_started:
 
-# ---------------- MAIN FLOW ----------------
-if st.session_state.questions:
+    q_index = st.session_state.current_q
 
-    total = len(st.session_state.questions)
-    idx = st.session_state.current_q
+    if q_index < len(st.session_state.questions):
 
-    if idx < total:
-        q = st.session_state.questions[idx]
+        q_data = st.session_state.questions[q_index]
 
-        # ---------------- TIMER (2 MIN) ----------------
-        if st.session_state.start_time:
-            elapsed = int(time.time() - st.session_state.start_time)
-            remaining = max(0, 120 - elapsed)
+        st.subheader(f"Question {q_index + 1}")
+        st.write(q_data["question"])
 
-            mins = remaining // 60
-            secs = remaining % 60
+        # ---------------- TIMER ----------------
+        elapsed = int(time.time() - st.session_state.start_time)
+        remaining = max(0, 120 - elapsed)
 
-            st.warning(f"⏱ Time Left: {mins:02d}:{secs:02d}")
+        st.info(f"⏳ Time left: {remaining} seconds")
 
-            if remaining == 0:
-                st.error("Time's up! Moving to next question.")
-                st.session_state.current_q += 1
-                st.session_state.start_time = time.time()
-                st.session_state.answered = False
-                st.rerun()
+        answer = st.text_area("Your Answer")
 
-        # ---------------- PROGRESS ----------------
-        st.progress((idx + 1) / total)
-        st.markdown(f"### 📌 Question {idx+1} of {total}")
-        st.info(q["question"])
-
-        # ---------------- INPUT ----------------
-        user_answer = st.text_area(
-            "✍️ Your Answer",
-            value=st.session_state.user_answer,
-            key=f"answer_{idx}"
-        )
-
-        # ---------------- SUBMIT ----------------
         if st.button("Submit Answer"):
-            if user_answer.strip() == "":
-                st.warning("Please enter an answer.")
-            else:
-                score = evaluate_answer(user_answer, q["ideal_answer"])
-                feedback = generate_feedback(score)
 
-                st.session_state.scores.append(score)
-                st.session_state.answered = True
-                st.session_state.user_answer = user_answer
+            score = evaluate_answer(answer, q_data["ideal_answer"])
+            feedback = generate_feedback(score)
 
-                insert_record(role, q["question"], user_answer, score, feedback)
+            st.success(f"Score: {round(score,2)}/10")
+            st.write(f"Feedback: {feedback}")
 
-                st.success(f"Score: {score}/10")
-                st.info(f"Feedback: {feedback}")
+            # Save per-session history
+            st.session_state.scores.append(score)
+            st.session_state.history.append({
+                "question": q_data["question"],
+                "answer": answer,
+                "score": score
+            })
 
-                st.markdown("### ✅ Ideal Answer")
-                st.success(q["ideal_answer"])
+            # Move next
+            st.session_state.current_q += 1
+            st.session_state.start_time = time.time()
 
-        # ---------------- NEXT ----------------
-        if st.session_state.answered:
-            if idx < total - 1:
-                if st.button("➡️ Next Question"):
-                    st.session_state.current_q += 1
-                    st.session_state.answered = False
-                    st.session_state.user_answer = ""
-                    st.session_state.start_time = time.time()
-                    st.rerun()
-            else:
-                if st.button("🏁 Finish Interview"):
-                    st.session_state.current_q += 1
-                    st.rerun()
+            st.rerun()
 
     else:
         # ---------------- FINAL RESULT ----------------
-        st.markdown("## 📊 Final Result")
+        st.header("📊 Final Result")
 
-        avg_score = round(sum(st.session_state.scores) / len(st.session_state.scores), 2)
-        st.success(f"Average Score: {avg_score}/10")
+        avg_score = sum(st.session_state.scores) / len(st.session_state.scores)
+        st.success(f"Average Score: {round(avg_score,2)}/10")
 
         # ---------------- GRAPH ----------------
-        st.markdown("### 📈 Performance Graph")
-        st.line_chart(st.session_state.scores)
+        st.subheader("📈 Performance Graph")
 
-        # ---------------- RESTART ----------------
+        fig, ax = plt.subplots()
+        ax.plot(st.session_state.scores, marker='o')
+        ax.set_xlabel("Question")
+        ax.set_ylabel("Score")
+        ax.set_title("Performance Over Questions")
+
+        st.pyplot(fig)
+
+        # ---------------- SESSION HISTORY ----------------
+        st.subheader("🧾 Your Session History")
+
+        for i, item in enumerate(st.session_state.history):
+            with st.expander(f"Q{i+1} - Score: {round(item['score'],2)}"):
+                st.write("**Question:**", item["question"])
+                st.write("**Your Answer:**", item["answer"])
+
         if st.button("🔄 Restart Interview"):
-            st.session_state.questions = []
-            st.session_state.current_q = 0
-            st.session_state.scores = []
-            st.session_state.answered = False
-            st.session_state.user_answer = ""
-            st.session_state.start_time = None
+            st.session_state.clear()
             st.rerun()
 
-# ---------------- HISTORY ----------------
+# ---------------- NO GLOBAL HISTORY ----------------
 st.divider()
-st.markdown("## 📜 Interview History")
-
-filter_role = st.selectbox("Filter by Role", ["All"] + roles)
-
-if st.button("Show History"):
-    records = get_all_records()
-
-    if filter_role != "All":
-        records = [r for r in records if r[0] == filter_role]
-
-    if records:
-        for i, r in enumerate(records, 1):
-            with st.expander(f"{i}. {r[0]} | Score: {r[3]}/10"):
-                st.write(f"**Question:** {r[1]}")
-                st.write(f"**Answer:** {r[2]}")
-                st.write(f"**Feedback:** {r[4]}")
-    else:
-        st.info("No records found.")
+st.info("Note: History is session-based and resets for each user.")
