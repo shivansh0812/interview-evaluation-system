@@ -62,13 +62,14 @@ if st.session_state.started and not st.session_state.finished:
     # -------- SUBMIT --------
     if st.button("Submit Answer"):
 
-        score = evaluate_answer(answer, question_data["answer"])
+        # ✅ CHANGED HERE → ideal_answer
+        score = evaluate_answer(answer, question_data["ideal_answer"])
         feedback = generate_feedback(score)
 
         st.session_state.history.append({
             "question": question_data["question"],
             "answer": answer,
-            "correct": question_data["answer"],
+            "correct": question_data["ideal_answer"],  # ✅ CHANGED HERE
             "score": score,
             "feedback": feedback
         })
