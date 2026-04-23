@@ -1,5 +1,6 @@
 import streamlit as st
 import matplotlib.pyplot as plt
+import random 
 
 from utils.question_loader import get_all_questions
 from utils.evaluator import evaluate_answer, generate_feedback
@@ -34,7 +35,9 @@ if not st.session_state.started:
         questions = get_all_questions(selected_role)
 
         if questions:
-            st.session_state.questions = questions[:3]
+            random.shuffle(questions)  # ✅ SHUFFLE QUESTIONS
+            st.session_state.questions = questions[:3]  # pick random 3
+
             st.session_state.started = True
             st.session_state.current_q = 0
             st.session_state.history = []
@@ -62,14 +65,13 @@ if st.session_state.started and not st.session_state.finished:
     # -------- SUBMIT --------
     if st.button("Submit Answer"):
 
-        # ✅ CHANGED HERE → ideal_answer
         score = evaluate_answer(answer, question_data["ideal_answer"])
         feedback = generate_feedback(score)
 
         st.session_state.history.append({
             "question": question_data["question"],
             "answer": answer,
-            "correct": question_data["ideal_answer"],  # ✅ CHANGED HERE
+            "correct": question_data["ideal_answer"],
             "score": score,
             "feedback": feedback
         })
