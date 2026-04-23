@@ -1,5 +1,4 @@
 import streamlit as st
-import time
 import matplotlib.pyplot as plt
 from utils.question_loader import get_random_question
 
@@ -13,15 +12,16 @@ if "started" not in st.session_state:
     st.session_state.current_q = 0
     st.session_state.history = []
     st.session_state.scores = []
-    st.session_state.start_time = None
     st.session_state.answer_input = ""
+    st.session_state.submitted = False
+    st.session_state.finished = False
 
 # ---------------- TITLE ----------------
 st.title("💼 Interview Evaluation System")
 st.markdown("Practice role-based questions and get instant feedback")
 st.divider()
 
-# ---------------- ROLE SELECTION ----------------
+# ---------------- ROLE ----------------
 roles = [
     "software_engineer",
     "data_analyst",
@@ -33,7 +33,7 @@ roles = [
 
 role = st.selectbox("Select Role", roles)
 
-# ---------------- START INTERVIEW ----------------
+# ---------------- START ----------------
 if not st.session_state.started:
     if st.button("🚀 Start Interview"):
         st.session_state.started = True
@@ -41,12 +41,13 @@ if not st.session_state.started:
         st.session_state.current_q = 0
         st.session_state.history = []
         st.session_state.scores = []
-        st.session_state.start_time = time.time()
         st.session_state.answer_input = ""
+        st.session_state.submitted = False
+        st.session_state.finished = False
         st.rerun()
 
-# ---------------- INTERVIEW FLOW ----------------
-if st.session_state.started:
+# ---------------- INTERVIEW ----------------
+if st.session_state.started and not st.session_state.finished:
 
     q_index = st.session_state.current_q
     question_data = st.session_state.questions[q_index]
@@ -54,66 +55,57 @@ if st.session_state.started:
     st.subheader(f"Question {q_index + 1}")
     st.write(question_data["question"])
 
-    # ---------------- TIMER ----------------
-    elapsed = int(time.time() - st.session_state.start_time)
-    remaining = max(0, 120 - elapsed)
-
-    st.info(f"⏳ Time left: {remaining} seconds")
-
-    # Auto refresh every 1 second
-    time.sleep(1)
-    st.rerun()
-
     # ---------------- ANSWER INPUT ----------------
     user_answer = st.text_area(
         "Your Answer",
-        key="answer_input",
-        height=150
+        value=st.session_state.answer_input,
+        key="answer_box",
+        height=150,
+        disabled=st.session_state.submitted
     )
 
+    if not st.session_state.submitted:
+        st.session_state.answer_input = user_answer
+
     # ---------------- SUBMIT ----------------
-    if st.button("Submit Answer"):
+    if not st.session_state.submitted:
+        if st.button("Submit Answer"):
 
-        # simple scoring logic (you can improve later)
-        score = min(len(user_answer.split()) // 5, 10)
+            # simple scoring logic (can improve later)
+            score = min(len(user_answer.split()) // 5, 10)
 
-        # save history
-        st.session_state.history.append({
-            "question": question_data["question"],
-            "answer": user_answer,
-            "ideal": question_data["answer"],
-            "score": score
-        })
+            st.session_state.history.append({
+                "question": question_data["question"],
+                "answer": user_answer,
+                "ideal": question_data["answer"],
+                "score": score
+            })
 
-        st.session_state.scores.append(score)
+            st.session_state.scores.append(score)
+            st.session_state.submitted = True
 
-        st.success(f"Score: {score}/10")
+    # ---------------- AFTER SUBMIT ----------------
+    if st.session_state.submitted:
 
-        # show correct answer
-        st.markdown("**✅ Ideal Answer:**")
+        st.success(f"Score: {st.session_state.scores[-1]}/10")
+
+        st.markdown("### ✅ Ideal Answer")
         st.write(question_data["answer"])
 
-        # reset answer
-        st.session_state.answer_input = ""
-
-        # reset timer
-        st.session_state.start_time = time.time()
-
-        # move next
+        # ---------------- NEXT OR FINISH ----------------
         if st.session_state.current_q < 2:
-            st.session_state.current_q += 1
+            if st.button("➡️ Next Question"):
+                st.session_state.current_q += 1
+                st.session_state.answer_input = ""
+                st.session_state.submitted = False
+                st.rerun()
         else:
-            st.session_state.finished = True
-
-        st.rerun()
-
-    # ---------------- FINISH BUTTON ----------------
-    if st.button("🏁 Finish Interview"):
-        st.session_state.finished = True
-        st.rerun()
+            if st.button("🏁 Finish Interview"):
+                st.session_state.finished = True
+                st.rerun()
 
 # ---------------- RESULTS ----------------
-if "finished" in st.session_state and st.session_state.finished:
+if st.session_state.finished:
 
     st.divider()
     st.header("📊 Interview Summary")
@@ -122,7 +114,7 @@ if "finished" in st.session_state and st.session_state.finished:
         avg_score = sum(st.session_state.scores) / len(st.session_state.scores)
         st.success(f"Average Score: {round(avg_score, 2)}/10")
 
-        # graph
+        # ---------------- GRAPH ----------------
         fig, ax = plt.subplots()
         ax.plot(st.session_state.scores, marker='o')
         ax.set_xlabel("Question")
