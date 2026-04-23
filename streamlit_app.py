@@ -46,6 +46,45 @@ if not st.session_state.started:
         st.session_state.finished = False
         st.rerun()
 
+# ---------------- SCORING FUNCTION ----------------
+def calculate_score(answer):
+    words = len(answer.split())
+
+    if words == 0:
+        return 0
+    elif words < 10:
+        return 3
+    elif words < 25:
+        return 5
+    elif words < 50:
+        return 7
+    elif words < 80:
+        return 8
+    else:
+        score = 9 + (words // 50)
+
+    return min(10, score)
+
+# ---------------- FEEDBACK FUNCTION ----------------
+def generate_feedback(user_answer, ideal_answer):
+    user_words = set(user_answer.lower().split())
+    ideal_words = set(ideal_answer.lower().split())
+
+    common = user_words.intersection(ideal_words)
+    overlap_ratio = len(common) / max(len(ideal_words), 1)
+
+    length = len(user_answer.split())
+
+    if length == 0:
+        return "❌ You did not provide an answer."
+
+    if overlap_ratio > 0.5:
+        return "✅ Strong answer. You covered most key concepts clearly."
+    elif overlap_ratio > 0.25:
+        return "👍 Decent answer, but missing some important points."
+    else:
+        return "⚠️ Your answer lacks key concepts. Try to be more detailed and structured."
+
 # ---------------- INTERVIEW ----------------
 if st.session_state.started and not st.session_state.finished:
 
@@ -71,13 +110,14 @@ if st.session_state.started and not st.session_state.finished:
     if not st.session_state.submitted:
         if st.button("Submit Answer"):
 
-            # simple scoring logic (can improve later)
-            score = min(len(user_answer.split()) // 5, 10)
+            score = calculate_score(user_answer)
+            feedback = generate_feedback(user_answer, question_data["answer"])
 
             st.session_state.history.append({
                 "question": question_data["question"],
                 "answer": user_answer,
                 "ideal": question_data["answer"],
+                "feedback": feedback,
                 "score": score
             })
 
@@ -88,6 +128,9 @@ if st.session_state.started and not st.session_state.finished:
     if st.session_state.submitted:
 
         st.success(f"Score: {st.session_state.scores[-1]}/10")
+
+        st.markdown("### 💬 Feedback")
+        st.info(st.session_state.history[-1]["feedback"])
 
         st.markdown("### ✅ Ideal Answer")
         st.write(question_data["answer"])
@@ -129,6 +172,7 @@ if st.session_state.finished:
         with st.expander(f"Q{i+1} - Score: {item['score']}/10"):
             st.write("**Question:**", item["question"])
             st.write("**Your Answer:**", item["answer"])
+            st.write("**Feedback:**", item["feedback"])
             st.write("**Ideal Answer:**", item["ideal"])
 
     # ---------------- RESET ----------------
