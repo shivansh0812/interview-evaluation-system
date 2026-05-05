@@ -42,8 +42,8 @@ if not st.session_state.started:
         questions = get_all_questions(selected_role)
 
         if questions:
-            random.shuffle(questions)  # ✅ SHUFFLE QUESTIONS
-            st.session_state.questions = questions[:3]  # pick random 3
+            random.shuffle(questions)
+            st.session_state.questions = questions[:3]
 
             st.session_state.started = True
             st.session_state.current_q = 0
@@ -70,7 +70,7 @@ if st.session_state.started and not st.session_state.finished:
     )
 
     # -------- SUBMIT --------
-    if st.button("Submit Answer"):
+    if st.button("Submit Answer") and not st.session_state.submitted:
 
         score = evaluate_answer(answer, question_data["ideal_answer"])
         feedback = generate_feedback(score)
@@ -97,15 +97,25 @@ if st.session_state.started and not st.session_state.finished:
         st.markdown("**Correct Answer:**")
         st.write(last["correct"])
 
-        if st.button("Next Question"):
+        col1, col2 = st.columns(2)
 
-            st.session_state.current_q += 1
-            st.session_state.submitted = False
+        # 👉 NEXT QUESTION
+        with col1:
+            if st.button("Next Question"):
 
-            if st.session_state.current_q >= len(st.session_state.questions):
+                st.session_state.current_q += 1
+                st.session_state.submitted = False
+
+                if st.session_state.current_q >= len(st.session_state.questions):
+                    st.session_state.finished = True
+
+                st.rerun()
+
+        # 👉 FINISH INTERVIEW BUTTON (NEW)
+        with col2:
+            if st.button("Finish Interview"):
                 st.session_state.finished = True
-
-            st.rerun()
+                st.rerun()
 
 # ---------------- RESULTS ----------------
 if st.session_state.finished:
