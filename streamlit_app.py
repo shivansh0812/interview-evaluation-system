@@ -25,7 +25,14 @@ st.markdown("Practice role-based questions and get instant feedback")
 st.divider()
 
 # ---------------- ROLE ----------------
-roles = ["software_engineer", "data_analyst", "web_designer", "machine_learning_engineer"]
+roles = [
+    "software_engineer",
+    "data_analyst",
+    "web_designer",
+    "machine_learning_engineer",
+    "it_manager",
+    "architect"
+]
 
 selected_role = st.selectbox("Select Role", roles)
 
